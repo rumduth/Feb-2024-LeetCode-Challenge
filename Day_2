@@ -1,0 +1,59 @@
+1291. Sequential Digits
+An integer has sequential digits if and only if each digit in the number is one more than the previous digit.
+
+Return a sorted list of all the integers in the range [low, high] inclusive that have sequential digits.
+
+
+//C++
+class Solution {
+public:
+    void helper(int i, int low, int high,vector<int>& ans)
+    {
+        int n = i;
+        while(n < high)
+        {
+            if(n >= low)
+                ans.push_back(n);
+            i++;
+            if(i == 10)
+                return;            
+            n = n*10 + i;
+        }
+        if(n == high)
+            ans.push_back(n);
+
+    }
+    vector<int> sequentialDigits(int low, int high) {
+        vector<int> ans;
+        for(int i = 1; i <= 8; i++)
+            helper(i, low, high,ans);
+        sort(ans.begin(),ans.end());
+        return ans;
+    }
+};
+
+
+Time Complexity: O(9*9) ---> Constant 
+Space Complexity: O(1)
+
+//Python3
+class Solution:
+    def sequentialDigits(self, low: int, high: int) -> List[int]:
+        def helper(low, high, i, my_list):
+            n = i
+            while n < high:
+                if low <= n:
+                    my_list.append(n)
+                i += 1
+                n = n * 10 + i
+                if i > 9:
+                    return
+            if n == high:
+                my_list.append(n)
+            return my_list
+        my_list = []
+        for i in range(1,9):
+            helper(low,high,i,my_list)
+        my_list.sort()
+        return my_list
+                
