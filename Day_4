@@ -1,0 +1,96 @@
+76. Minimum Window Substring
+Given two strings s and t of lengths m and n respectively, return the minimum window 
+substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string "".
+
+The testcases will be generated such that the answer is unique.
+Example 1:
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+Example 2:
+Input: s = "a", t = "a"
+Output: "a"
+Explanation: The entire string s is the minimum window.
+
+//C++
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> freq;
+        int count = 0;
+        for(int i = 0; i < t.size(); i++)
+        {
+            if(!freq.count(t[i]))
+                count++;
+            freq[t[i]]++;
+        }
+        int start = -1;
+        int min_length = INT_MAX;
+        int j = 0;
+        int cnt = 0;
+        unordered_map<char, int> checking;
+        for(int i = 0; i < s.size(); i++)
+        {
+            if(!freq.count(s[i]))
+                continue;
+            checking[s[i]]++;
+            if(checking[s[i]] == freq[s[i]])
+                cnt++;
+            while(cnt == count)
+            {
+                char d = s[j];
+                if(!checking.count(d))
+                {
+                    j++;
+                    continue;
+                }
+                if(i-j+1 < min_length)
+                {
+                    min_length = i - j + 1;
+                    start = j;
+                }
+                checking[d]--;
+                if(checking[d] < freq[d])
+                {
+                    cnt--;
+                }
+                j++;
+            }
+        }
+        return min_length == INT_MAX ? "" : s.substr(start,min_length);
+    }
+};
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+//In Python3
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        alphabet = Counter(t)
+        my_alphabet = Counter()
+        count = 0
+        start = -1
+        min_length = float('inf')
+        j = 0
+        for index, char in enumerate(s):
+            if char not in alphabet:
+                continue
+            my_alphabet[char] += 1
+            if my_alphabet[char] == alphabet[char]:
+                count += 1
+            while count == len(alphabet):
+                d = s[j]
+                if d not in alphabet:
+                    j += 1
+                    continue
+                my_alphabet[d] -= 1
+                if index - j + 1 < min_length:
+                    start = j
+                    min_length = index - j + 1
+                if my_alphabet[d] < alphabet[d]:
+                    count -= 1
+                j += 1
+        return s[start:start+min_length] if start != -1 else ""
+
+            
