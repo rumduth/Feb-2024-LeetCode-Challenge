@@ -1,0 +1,113 @@
+647. Palindromic Substrings
+Given a string s, return the number of palindromic substrings in it.
+
+A string is a palindrome when it reads the same backward as forward.
+
+A substring is a contiguous sequence of characters within the string.
+
+//C++
+//Recursion
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int ans = 0;
+        int n = s.size();
+        vector<vector<int>> dp(n, vector<int>(n,-1));
+        for(int i = 0; i < n; i++)
+            for(int j = i; j < n; j++)
+                if(helper(dp,s,i,j)) ans++;
+        return ans;
+    }
+    int helper(vector<vector<int>>& dp, string& s, int i, int j)
+    {
+        if(i >= j)
+            return 1;
+        if(dp[i][j] != -1)
+            return dp[i][j];
+        dp[i][j] = s[i] == s[j] && helper(dp,s,i+1,j-1);
+        return dp[i][j];
+    }
+};
+Time Complexity: O(N^2)
+Space Complexity: O(N*N)
+
+//Iterative
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int n = s.size();
+        vector<vector<bool>> dp(n, vector<bool>(n,false));
+        int count = 0;
+        for(int i = 0; i < n; i++)
+        {
+            dp[i][i] = true;
+            count++;
+        }
+        //Check for palindromic substrings of length 2
+        for(int i = 0; i < n - 1; i++)
+            if(s[i] == s[i+1])
+            {
+                dp[i][i+1] = true;
+                count++;
+            }
+        
+        //Check for palindromic substrings of length >= 3
+        for(int len = 3; len <= n; len++)
+        {
+            for(int i = 0; i <= n - len; i++)
+            {
+                int j = i + len - 1;
+                if(s[i] == s[j] && dp[i+1][j-1])
+                {
+                    dp[i][j] = true;
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+};
+
+//Python3
+//Recursive
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        cache = {}
+        def helper(i, j):
+            if i >= j:
+                return True
+            if (i,j) in cache:
+                return cache[(i,j)]
+            cache[(i,j)] = s[i] == s[j] and helper(i+1, j-1)
+            return cache[(i,j)]
+        n = len(s)
+        ans = 0
+        for i in range(n):
+            for j in range(i,n):
+                if(helper(i,j)):
+                    ans += 1
+        return ans
+
+//Iterative
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        n = len(s)
+        dp = [[0] * n for _ in range(n)]
+        count = 0
+        for i in range(n):
+            dp[i][i] = 1
+            count += 1
+        for i in range(n-1):
+            if s[i] == s[i+1]:
+                count += 1
+                dp[i][i+1] = 1
+        
+        for l in range(3,n+1):
+            for i in range(n-l+1):
+                j = i + l - 1
+                dp[i][j] = s[i] == s[j] and dp[i+1][j-1]
+                if dp[i][j] == 1:
+                    count += 1
+        return count
+
+
