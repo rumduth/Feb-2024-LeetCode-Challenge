@@ -1,0 +1,157 @@
+To solve the second version of Cherry Pickup II, we should finish the first one
+
+741. Cherry Pickup
+You are given an n x n grid representing a field of cherries, each cell is one of three possible integers.
+
+0 means the cell is empty, so you can pass through,
+1 means the cell contains a cherry that you can pick up and pass through, or
+-1 means the cell contains a thorn that blocks your way.
+Return the maximum number of cherries you can collect by following the rules below:
+
+Starting at the position (0, 0) and reaching (n - 1, n - 1) by moving right or down through valid path cells (cells with value 0 or 1).
+After reaching (n - 1, n - 1), returning to (0, 0) by moving left or up through valid path cells.
+When passing through a path cell containing a cherry, you pick it up, and the cell becomes an empty cell 0.
+If there is no valid path between (0, 0) and (n - 1, n - 1), then no cherries can be collected.
+ 
+
+
+class Solution {
+public:
+    int cherryPickup(vector<vector<int>>& grid) {
+        int n = grid.size();
+        int dp[n][n][2*n-1];
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < n; j++)
+                for(int k = 0; k < 2*n - 1; k++)
+                    dp[i][j][k] = INT_MIN;
+                    
+        dp[0][0][0] = grid[0][0];
+        for(int k = 1; k <= 2*n -2; k++)
+        {
+            for(int x1 = 0; x1 < n; x1++)
+            {
+                for(int x2 = 0; x2 < n; x2++)
+                {
+                    int y1 = k - x1, y2 = k - x2;
+                    if(y1 < 0 || y1 >= n || y2 < 0 || y2 >= n || grid[x1][y1] == -1 || grid[x2][y2] == -1)
+                        continue;
+                    int cherries = grid[x1][y1];
+                    if(x1 != x2) cherries += grid[x2][y2];
+                    for(int i = x1 - 1; i <= x1; i++)
+                    {
+                        for(int j = x2 - 1; j <= x2; j++)
+                        {
+                            int prev_k = k - 1;
+                            if(i >= 0 && j >= 0 && prev_k >= 0 && dp[i][j][prev_k] != INT_MIN)
+                                dp[x1][x2][k] = max(dp[x1][x2][k],dp[i][j][prev_k] + cherries);
+                        }
+                    } 
+                }
+            }
+        }
+        return max(0,dp[n-1][n-1][2*n-2]);
+    }
+};
+Time Complexity: O(N^3)
+Space Complexity: O(N^3)
+
+1463. Cherry Pickup II
+You are given a rows x cols matrix grid representing a field of cherries where grid[i][j] represents the number of cherries that you can collect from the (i, j) cell.
+
+You have two robots that can collect cherries for you:
+
+Robot #1 is located at the top-left corner (0, 0), and
+Robot #2 is located at the top-right corner (0, cols - 1).
+Return the maximum number of cherries collection using both robots by following the rules below:
+
+From a cell (i, j), robots can move to cell (i + 1, j - 1), (i + 1, j), or (i + 1, j + 1).
+When any robot passes through a cell, It picks up all cherries, and the cell becomes an empty cell.
+When both robots stay in the same cell, only one takes the cherries.
+Both robots cannot move outside of the grid at any moment.
+Both robots should reach the bottom row in grid.
+
+//Iterative
+class Solution {
+public:
+    int cherry_Lyn_Collection_GPT(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        int dp[m][n][n];
+        for(int i = 0; i < m; i++)
+            for(int j = 0; j < n; j++)
+                for(int k = 0; k < n; k++)
+                    dp[i][j][k] = 0;
+        dp[0][0][n-1] = grid[0][0] + grid[0][n-1];
+        for(int row = 1; row < m; row++)
+        {
+            for(int col1 = 0; col1 <= min(row,n-1); col1++)
+            {
+                for(int col2 = n-1; col2 >= max(0,n-1-row); col2--)
+                {
+                    for(int prev_col_1 : {col1-1,col1,col1+1})
+                    {
+                        for(int prev_col_2 : {col2-1,col2,col2+1})
+                        {
+                            if(prev_col_1 < 0 || prev_col_1 >= n || prev_col_2 < 0 || prev_col_2 >=n)
+                                continue;
+                            int cherries = 0;
+                            cherries += grid[row][col1];
+                            if(col1 != col2) cherries += grid[row][col2];
+                            dp[row][col1][col2] = max(dp[row][col1][col2], cherries + dp[row-1][prev_col_1][prev_col_2]);
+                        }
+                    }
+                }
+            }
+        }
+        int ans = 0;
+        for(int col1 = 0; col1 < n; col1++)
+        {
+            for(int col2 = 0; col2 < n; col2++)
+                ans = max(ans,dp[m-1][col1][col2]);
+        }
+        return ans;
+
+    }
+};
+Time Complexity: O(N^3)
+Space Complexity: O(N^3)
+
+
+//Recursive
+class Solution {
+public:
+    int cherryPickup(vector<vector<int>>& grid) {
+        int rows = grid.size();
+        int cols = grid[0].size();
+        
+        // Initialize the DP array
+        vector<vector<vector<int>>> memo(rows, vector<vector<int>>(cols, vector<int>(cols, -1)));
+        
+        // Start the recursion from the top row
+        return dfs(grid, memo, 0, 0, cols - 1);
+    }
+    
+    int dfs(vector<vector<int>>& grid, vector<vector<vector<int>>>& memo, int row, int col1, int col2) {
+        // Check if the current state is outside the grid or already visited
+        if (row == grid.size() || col1 < 0 || col1 >= grid[0].size() || col2 < 0 || col2 >= grid[0].size())
+            return 0;
+        
+        // Check if the current state is already memoized
+        if (memo[row][col1][col2] != -1)
+            return memo[row][col1][col2];
+        
+        // Calculate cherries collected for the current cell
+        int cherries = grid[row][col1] + (col1 != col2 ? grid[row][col2] : 0);
+        
+        // Calculate cherries collected for the next row
+        int max_cherries = 0;
+        for (int new_col1 : {col1 - 1, col1, col1 + 1}) {
+            for (int new_col2 : {col2 - 1, col2, col2 + 1}) {
+                max_cherries = max(max_cherries, dfs(grid, memo, row + 1, new_col1, new_col2));
+            }
+        }
+        
+        // Update memo and return cherries collected
+        return memo[row][col1][col2] = cherries + max_cherries;
+    }
+};
