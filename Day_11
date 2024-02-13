@@ -73,7 +73,7 @@ Both robots should reach the bottom row in grid.
 //Iterative
 class Solution {
 public:
-    int cherry_Lyn_Collection_GPT(vector<vector<int>>& grid) {
+    int cherryPickup(vector<vector<int>>& grid) {
         int m = grid.size();
         int n = grid[0].size();
         int dp[m][n][n];
