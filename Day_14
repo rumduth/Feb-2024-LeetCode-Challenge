@@ -1,0 +1,53 @@
+
+2149. Rearrange Array Elements by Sign
+You are given a 0-indexed integer array nums of even length consisting of an equal number of positive and negative integers.
+
+You should rearrange the elements of nums such that the modified array follows the given conditions:
+
+Every consecutive pair of integers have opposite signs.
+For all integers with the same sign, the order in which they were present in nums is preserved.
+The rearranged array begins with a positive integer.
+Return the modified array after rearranging the elements to satisfy the aforementioned conditions.
+//C++
+class Solution {
+public:
+    vector<int> rearrangeArray(vector<int>& nums) {
+        int i = 0;
+        int j = 1;
+        vector<int> v(nums.size());
+        for(int k = 0; k < nums.size(); k++)
+        {
+            if(nums[k] > 0)
+            {
+                v[i] = nums[k];
+                i+=2;
+            }
+            else
+            {
+                v[j] = nums[k]; 
+                j += 2;
+            }
+        }
+        return v;
+    }
+};
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+//Python3
+class Solution:
+    def rearrangeArray(self, nums: List[int]) -> List[int]:
+        positive = []
+        negative = []
+        for n in nums:
+            if n > 0:
+                positive.append(n)
+            else:
+                negative.append(n)
+        ans = []
+        while negative:
+            ans.append(positive.pop(0))
+            ans.append(negative.pop(0))
+            
+
+        return ans
