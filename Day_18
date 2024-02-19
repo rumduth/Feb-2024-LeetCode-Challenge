@@ -1,0 +1,117 @@
+2402. Meeting Rooms III
+
+//C++
+class Solution {
+public:
+    static bool cmp(vector<int>& a, vector<int>& b)
+    {
+        return a[0] < b[0];
+    }
+    int mostBooked(int n, vector<vector<int>>& meetings) {
+        sort(meetings.begin(),meetings.end(),cmp);
+        priority_queue<int, vector<int>, greater<int>> rooms;
+        priority_queue<pair<long long,long long>, vector<pair<long long, long long>>, greater<pair<long long,long long>>> endTimes;
+        for(int i = 0; i < n; i++)
+            rooms.push(i);
+        vector<int> freq(n,0);
+
+        for(int i = 0; i < meetings.size(); i++)
+        {
+            if(endTimes.empty())
+            {
+                int index = rooms.top();
+                rooms.pop();
+                freq[index]++;
+                endTimes.push({meetings[i][1],index});
+            }
+            else if(endTimes.top().first <= meetings[i][0])
+            {
+                while(!endTimes.empty() && endTimes.top().first <= meetings[i][0])
+                {
+                    rooms.push(endTimes.top().second);
+                    endTimes.pop();
+                }
+                int index = rooms.top();
+                rooms.pop();
+                freq[index]++;
+                endTimes.push({meetings[i][1],index});
+            }
+            else if(endTimes.top().first > meetings[i][0])
+            {
+                if(rooms.empty())
+                {
+                    int index = endTimes.top().second;
+                    long long time = endTimes.top().first;
+                    endTimes.pop();
+                    freq[index]++;
+                    endTimes.push({time + meetings[i][1] - meetings[i][0],index});
+                }
+                else
+                {
+                    int index = rooms.top();
+                    rooms.pop();
+                    freq[index]++;
+                    endTimes.push({meetings[i][1],index});
+                }
+            }
+        }
+        int max_freq = 0;
+        for(int i = 0; i < n; i++)
+            max_freq = max(max_freq,freq[i]);
+       
+        for(int i = 0; i < n; i++)
+            if(max_freq == freq[i])
+                return i;
+        return -1;
+    }
+};
+
+/*
+If I want to use the room, I need to see if my start time is 
+greater than any endTimes of the room used before me.
+If not, I have to check if any room available, 
+If no room available, I have to wait. 
+*/
+
+Time Complexity: O(N^2logN)
+Space Complexity: O(N)
+
+//Python3
+class Solution:
+    def mostBooked(self, n: int, meetings: List[List[int]]) -> int:
+        meetings.sort(key = lambda x : x[0])
+        rooms = []
+        end_times = []
+        for i in range(n):
+            heapq.heappush(rooms,i)
+        freq = [0] * n
+        for meeting in meetings:
+            if not end_times:
+                index = heapq.heappop(rooms)
+                freq[index] += 1
+                heapq.heappush(end_times,(meeting[1],index))
+            elif end_times[0][0] <= meeting[0]:
+                while end_times and end_times[0][0] <= meeting[0]:
+                    room = heapq.heappop(end_times)[1]
+                    heapq.heappush(rooms,room)
+                index = heapq.heappop(rooms)
+                freq[index] += 1
+                heapq.heappush(end_times,(meeting[1],index))
+            elif end_times[0][0] > meeting[0]:
+                if not rooms:
+                    end_time, index = heapq.heappop(end_times)
+                    freq[index] += 1
+                    heapq.heappush(end_times,(end_time + meeting[1] - meeting[0], index))
+                else:
+                    index = heapq.heappop(rooms)
+                    freq[index] += 1
+                    heapq.heappush(end_times,(meeting[1],index))
+
+        
+
+        max_freq = max(freq)
+        return freq.index(max_freq)
+
+                    
+
+        
