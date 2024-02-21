@@ -1,0 +1,29 @@
+201. Bitwise AND of Numbers Range
+
+//C++
+class Solution {
+public:
+    int rangeBitwiseAnd(int left, int right) {
+        int ans = 0;
+        int i = 0;
+        while(left < right)
+        {
+            left = left >> 1;
+            right = right >> 1;
+            i++;
+        }
+        return left << i;
+    }
+};
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+//Python3
+class Solution:
+    def rangeBitwiseAnd(self, left: int, right: int) -> int:
+        i = 0
+        while left < right:
+            left >>= 1
+            right >>= 1
+            i += 1
+        return left << i

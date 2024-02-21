@@ -1,0 +1,25 @@
+ 268. Missing Number
+
+
+
+//Python3
+ class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        n = len(nums)
+        return int(n*(n+1)/2) - sum(nums)
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+//C++
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int sum = 0;
+        int n = nums.size();
+        for(int i = 0; i < nums.size(); i++)
+            sum += nums[i];
+    
+        return n*(n+1)/2 - sum;
+    }
+};
